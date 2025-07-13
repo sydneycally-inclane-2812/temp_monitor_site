@@ -15,7 +15,7 @@ data = pd.DataFrame(columns=['timestamp', 'temperature', 'humidity'])
 # Variable that stores the last time the reset_server 
 last_reset = 0
 last_ping = 0
-max_history = 500
+max_history = 10000
 wait_time = 1
 
 class RateLimitError(Exception):
@@ -106,3 +106,5 @@ def update_status():
 
 if __name__ == '__main__':  
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+    
