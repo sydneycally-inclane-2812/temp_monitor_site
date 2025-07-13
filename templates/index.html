@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP Server Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://unpkg.com/terminal.css@0.7.4/dist/terminal.min.css" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .data-table td {
+            border: 1px solid var(--primary-color);
+            padding: 10px;
+            vertical-align: top;
+        }
+        .label-column {
+            width: 200px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .value-column {
+            word-break: break-all;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ESP Server Dashboard</h1>
+        
+        <button id="getData" class="btn btn-primary">Get Data</button>
+        <button id="sendReset" class="btn btn-error">Send Reset</button>
+        
+        <br><br>
+
+        <div class="chart-container">
+            <h3>Temperature & Humidity Over Time</h3>
+            <svg id="chart" width="800" height="400"></svg>
+        </div>
+
+        <table class="data-table">
+            <tr>
+                <td class="label-column">Total Records:</td>
+                <td class="value-column" id="totalRecords">--</td>
+            </tr>
+            <tr>
+                <td class="label-column">Last Reset Time:</td>
+                <td class="value-column" id="lastReset">--</td>
+            </tr>
+            <tr>
+                <td class="label-column">Last Ping:</td>
+                <td class="value-column" id="lastPing">--</td>
+            </tr>
+            <tr>
+                <td class="label-column">Ping Delta:</td>
+                <td class="value-column" id="pingDelta">--</td>
+            </tr>
+            <tr>
+                <td class="label-column">Reset Delta:</td>
+                <td class="value-column" id="resetDelta">--</td>
+            </tr>
+        </table>
+        
+        <div id="errorMessage" class="error" style="display: none;"></div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
