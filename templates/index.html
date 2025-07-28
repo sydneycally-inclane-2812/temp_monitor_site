@@ -27,6 +27,14 @@
             word-break: break-all;
             font-family: monospace;
         }
+        .status-online {
+            color: #4ecdc4;
+            font-weight: bold;
+        }
+        .status-offline {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -34,7 +42,7 @@
         <h1>ESP Server Dashboard</h1>
         
         <button id="getData" class="btn btn-primary">Get Data</button>
-        <button id="sendReset" class="btn btn-error">Send Reset</button>
+        <button id="sendReset" class="btn btn-error">Power Trigger</button>
         
         <br><br>
 
@@ -49,8 +57,8 @@
                 <td class="value-column" id="totalRecords">--</td>
             </tr>
             <tr>
-                <td class="label-column">Last Reset Time:</td>
-                <td class="value-column" id="lastReset">--</td>
+                <td class="label-column">Last Power Trigger:</td>
+                <td class="value-column" id="lastPwrTrigger">--</td>
             </tr>
             <tr>
                 <td class="label-column">Last Ping:</td>
@@ -63,6 +71,14 @@
             <tr>
                 <td class="label-column">Reset Delta:</td>
                 <td class="value-column" id="resetDelta">--</td>
+            </tr>
+            <tr>
+                <td class="label-column">PC Status:</td>
+                <td class="value-column" id="pcStatus">--</td>
+            </tr>
+            <tr>
+                <td class="label-column">Last Motion Detected:</td>
+                <td class="value-column" id="lastMotion">--</td>
             </tr>
         </table>
         

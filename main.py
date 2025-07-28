@@ -13,11 +13,13 @@ app.template_folder = 'templates'
 data = pd.DataFrame(columns=['timestamp', 'temperature', 'humidity'])
 
 # Variable that stores the last time the reset_server 
-last_reset = 0
+last_pwr_trigger = 0
 last_ping = 0
 max_history = 15000
 wait_time = 1
-
+credentials = "damnimgoingtovietnam"
+pc_status = False
+last_motion_detected = 0
 class RateLimitError(Exception):
     pass
 
@@ -29,17 +31,38 @@ def index():
 @app.route('/api/put_reset', methods=['PUT']) # Put
 def update_reset():
     '''
-    Updates the last reset time to now
+    Updates the last reset time to now, needs to attach the correct credentials
     Used by the web interface
     '''
-    global last_reset
-    last_reset = int(time.time())
-    return jsonify({
-        'status': 'success',
-        'message': 'Reset time updated',
-        'reset_time': last_reset,
-        'readable_time': time.ctime(last_reset)
-    })
+    global last_pwr_trigger
+    
+    try:
+        json_data = request.get_json()
+        if not json_data:
+            return jsonify({
+                'status': 'error',
+                'message': 'No data provided'
+            }), 400
+        
+        if json_data.get("credentials") != credentials:
+            return jsonify({
+                'status': 'error',
+                'message': 'Invalid credentials'
+            }), 401
+        
+        last_pwr_trigger = int(time.time())
+        return jsonify({
+            'status': 'success',
+            'message': 'Power trigger updated',
+            'last_pwr_trigger': last_pwr_trigger,
+            'readable_time': time.ctime(last_pwr_trigger)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
 @app.route('/api/get_data',  methods=['GET']) # Get
 def get_data():
@@ -52,12 +75,14 @@ def get_data():
         'status': 'success',
         'data': data.to_dict('records'),
         'total_records': len(data),
-        'last_reset': last_reset,
-        'text_last_reset': time.ctime(last_reset) if last_reset != 0 else "Never",
+        'last_pwr_trigger': last_pwr_trigger,
+        'text_last_pwr_trigger': time.ctime(last_pwr_trigger) if last_pwr_trigger != 0 else "Never",
         'last_ping': last_ping,
         'text_last_ping': time.ctime(last_ping) if last_ping != 0 else "Never",
         'ping_delta': int(time.time()) - last_ping if last_ping != 0 else "Never",
-        'reset_delta': int(time.time()) - last_reset if last_reset != 0 else "Never"
+        'reset_delta': int(time.time()) - last_pwr_trigger if last_pwr_trigger != 0 else "Never",
+        'pc_status': pc_status,
+        'last_motion_detected': last_motion_detected
     })
 
 @app.route('/api/update_status', methods=["POST"]) # Post
@@ -68,7 +93,7 @@ def update_status():
     If last call was less than wait_time seconds ago, throw error too fast
     Used by the ESP8266
     '''
-    global last_reset, last_ping, data
+    global last_pwr_trigger, last_ping, data
     curr_time = int(time.time())
     if curr_time - last_ping < wait_time:
         raise RateLimitError(f"Too fast, last API call was {curr_time - last_ping} second(s) ago. Wait {wait_time} second(s)")
@@ -77,6 +102,9 @@ def update_status():
         json_data = request.get_json()
         if not json_data:
             raise ValueError("Could not get valid data")
+        
+        if json_data.get("credentials") != credentials:
+            raise ValueError("Wrong credentials.")
         
         new_row = {
             'timestamp': int(time.time()),
@@ -93,6 +121,7 @@ def update_status():
 
         return jsonify({
             'status': 'success',
+            'last_pwr_trigger': last_pwr_trigger,
             'message': 'Data updated successfully'
         })
 
