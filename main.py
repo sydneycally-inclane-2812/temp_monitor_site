@@ -95,7 +95,7 @@ def update_status():
     If last call was less than wait_time seconds ago, throw error too fast
     Used by the ESP8266
     '''
-    global last_pwr_trigger, last_ping, data
+    global last_pwr_trigger, last_ping, data, pc_status
     curr_time = int(time.time())
     if curr_time - last_ping < wait_time:
         raise RateLimitError(f"Too fast, last API call was {curr_time - last_ping} second(s) ago. Wait {wait_time} second(s)")
@@ -108,6 +108,8 @@ def update_status():
         if json_data.get("credentials") != credentials:
             raise ValueError("Wrong credentials.")
         
+        json_pc_status = json_data.get('pc_status')
+        pc_status = True if json_pc_status == "ON" else False
         new_row = {
             'timestamp': int(time.time()),
             'temperature': json_data.get('temperature'),
