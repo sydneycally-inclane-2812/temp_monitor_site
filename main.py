@@ -2,8 +2,10 @@ from flask import Flask, render_template, request, jsonify
 import time
 import pandas as pd
 import os
+import dotenv
 
 app = Flask(__name__)
+dotenv.load_dotenv()
 
 # Configure static and template folders
 app.static_folder = 'static'
@@ -17,7 +19,7 @@ last_pwr_trigger = 0
 last_ping = 0
 max_history = 15000
 wait_time = 1
-credentials = "damnimgoingtovietnam"
+credentials = os.getenv('CREDENTIALS')
 pc_status = False
 last_motion_detected = 0
 class RateLimitError(Exception):
