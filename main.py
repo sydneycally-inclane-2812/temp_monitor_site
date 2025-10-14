@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from werkzeug.middleware.proxy_fix import ProxyFix
 import time
 import pandas as pd
 import os
@@ -6,6 +7,7 @@ import dotenv
 
 app = Flask(__name__)
 dotenv.load_dotenv()
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
 
 # Configure static and template folders
 app.static_folder = 'static'
@@ -135,9 +137,12 @@ def update_status():
             'message': str(e)
         }), 500
 
+@app.get("/healthcheck")
+def healthcheck():
+    return jsonify(status="Online"), 200
 
 
 if __name__ == '__main__':  
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='0.0.0.0', port=5000)
 
     
